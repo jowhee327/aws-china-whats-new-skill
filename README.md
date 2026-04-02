@@ -1,5 +1,7 @@
 # AWS China What's New Skill
 
+**English** | [中文](README_CN.md)
+
 An [OpenClaw](https://github.com/openclaw/openclaw) Agent Skill for querying AWS China Region (Beijing / Ningxia) service launch announcements.
 
 ## Features
