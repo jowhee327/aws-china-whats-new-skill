@@ -5,11 +5,17 @@ import argparse
 import json
 import os
 import re
+import subprocess
 import sys
+import time
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 SKILL_DIR = os.path.dirname(SCRIPT_DIR)
 DATA_FILE = os.path.join(SKILL_DIR, "data", "whats_new.json")
+FETCH_SCRIPT = os.path.join(SCRIPT_DIR, "fetch_data.py")
+
+# TTL in seconds (24 hours)
+DATA_TTL = 24 * 60 * 60
 
 # Region detection keywords
 BEIJING_KEYWORDS = ["Beijing", "cn-north-1", "Sinnet", "\u5317\u4eac"]
@@ -17,10 +23,33 @@ NINGXIA_KEYWORDS = ["Ningxia", "cn-northwest-1", "NWCD", "\u5b81\u590f"]
 BOTH_KEYWORDS = ["China Regions", "\u4e2d\u56fd\u533a\u57df"]
 
 
-def load_data():
-    """Load the data file."""
+def ensure_data():
+    """Ensure data file exists and is fresh. Auto-fetch if needed."""
+    need_full = False
+    need_incremental = False
+
     if not os.path.exists(DATA_FILE):
-        print(json.dumps({"error": f"Data file not found: {DATA_FILE}. Run fetch_data.py first."}))
+        need_full = True
+    else:
+        age = time.time() - os.path.getmtime(DATA_FILE)
+        if age > DATA_TTL:
+            need_incremental = True
+
+    if need_full:
+        print("Data file not found, fetching all years...", file=sys.stderr)
+        subprocess.run([sys.executable, FETCH_SCRIPT], check=True,
+                       stdout=sys.stderr, stderr=sys.stderr)
+    elif need_incremental:
+        print("Data stale (>24h), running incremental update...", file=sys.stderr)
+        subprocess.run([sys.executable, FETCH_SCRIPT, "--incremental"], check=True,
+                       stdout=sys.stderr, stderr=sys.stderr)
+
+
+def load_data():
+    """Load the data file, auto-fetching if needed."""
+    ensure_data()
+    if not os.path.exists(DATA_FILE):
+        print(json.dumps({"error": "Failed to fetch data."}))
         sys.exit(1)
     with open(DATA_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
