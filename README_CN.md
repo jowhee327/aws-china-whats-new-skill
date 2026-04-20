@@ -2,7 +2,7 @@
 
 [English](README.md) | **中文**
 
-一个 [OpenClaw](https://github.com/openclaw/openclaw) Agent Skill，用于查询 AWS 中国区（北京/宁夏）服务落地公告。
+一个 Agent Skill，用于查询 AWS 中国区（北京/宁夏）服务落地公告。
 
 ## 功能
 
