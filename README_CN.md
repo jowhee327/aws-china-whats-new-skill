@@ -75,7 +75,7 @@ python3 scripts/query.py --service "SageMaker" --region beijing --year 2025
 }
 ```
 
-## 作为 OpenClaw Skill 安装
+## 作为 Agent Skill 安装
 
 **方式一：从 ClawHub 安装**
 ```bash
